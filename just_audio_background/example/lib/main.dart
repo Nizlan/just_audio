@@ -25,7 +25,7 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   static int _nextMediaId = 0;
   late AudioPlayer _player;
-  final _playlist = ConcatenatingAudioSource(children: [
+  final playlist = ConcatenatingAudioSource(children: [
     ClippingAudioSource(
       start: const Duration(seconds: 60),
       end: const Duration(seconds: 90),
@@ -92,7 +92,7 @@ class MyAppState extends State<MyApp> {
       print('A stream error occurred: $e');
     });
     try {
-      await _player.setAudioSource(_playlist);
+      await _player.setAudioSource(playlist);
     } catch (e, stackTrace) {
       // Catch load errors: 404, invalid url ...
       print("Error loading playlist: $e");
@@ -233,7 +233,7 @@ class MyAppState extends State<MyApp> {
                     return ReorderableListView(
                       onReorder: (int oldIndex, int newIndex) {
                         if (oldIndex < newIndex) newIndex--;
-                        _playlist.move(oldIndex, newIndex);
+                        playlist.move(oldIndex, newIndex);
                       },
                       children: [
                         for (var i = 0; i < sequence.length; i++)
@@ -248,7 +248,7 @@ class MyAppState extends State<MyApp> {
                               ),
                             ),
                             onDismissed: (dismissDirection) {
-                              _playlist.removeAt(i);
+                              playlist.removeAt(i);
                             },
                             child: Material(
                               color: i == state!.currentIndex
@@ -273,7 +273,7 @@ class MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            _playlist.add(AudioSource.uri(
+            playlist.add(AudioSource.uri(
               Uri.parse("asset:///audio/nature.mp3"),
               tag: MediaItem(
                 id: '${_nextMediaId++}',
@@ -382,6 +382,10 @@ class ControlButtons extends StatelessWidget {
             },
           ),
         ),
+        IconButton(
+            onPressed: () =>
+                player.setAudioSource(MyAppState().playlist, initialIndex: 2),
+            icon: const Icon(Icons.refresh))
       ],
     );
   }
